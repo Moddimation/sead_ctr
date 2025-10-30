@@ -39,24 +39,22 @@ endif()
 __compiler_armcc(C)
 __compiler_armcc(CXX)
 
-file(GLOB_RECURSE csourcefiles "Source/*.c")
-file(GLOB_RECURSE cxxsourcefiles "Source/*.cpp")
+file(GLOB_RECURSE SOURCES src/*.c src/*.cpp)
 
-add_library(sead ${csourcefiles} ${cxxsourcefiles})
+add_library(sead ${SOURCES})
 
-target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:CXX>:
-    --apcs=//interwork --cpu=MPCore --fpmode=fast --cpp --arm --force_new_nothrow
-    --signed_chars --multibyte-chars --locale=japanese --no_vfe # workaround, vfe should be enabled
-    --no_rtti_data --no_rtti --no_exceptions -O3 -Otime --data-reorder --split_sections --forceinline
-    >)
-
-target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:C>:
-    --apcs=//interwork --cpu=MPCore --fpmode=fast --c99 --arm
-    --signed_chars --multibyte-chars --locale=japanese
-    -Otime --data-reorder --split_sections
-    >)
-
+target_include_directories(sead PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../nnsdk/include)
+target_include_directories(sead PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_definitions(sead PUBLIC NON_MATCHING=)
 
-target_include_directories(sead PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../nnsdk/Include)
-target_include_directories(sead PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:CXX>:--apcs=//interwork --arm --cpp>)
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:CXX>:--cpu=MPCore --fpmode=fast --force_new_nothrow>)
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:CXX>:--locale=japanese --multibyte-chars --signed_chars>)
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:CXX>:--no_exceptions --no_rtti --no_rtti_data>)
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-O3 -Otime --data-reorder --split_sections --forceinline>)
+
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:C>:--apcs=//interwork --arm --c99>)
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:C>:--cpu=MPCore --fpmode=fast>)
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:C>:--locale=japanese --multibyte-chars --signed_chars>)
+target_compile_options(sead PUBLIC $<$<COMPILE_LANGUAGE:C>:-Otime --data-reorder --split_sections>)
+
